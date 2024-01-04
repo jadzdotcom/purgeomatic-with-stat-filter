@@ -35,9 +35,14 @@ def purge(movie):
     movie_response_data = r.json()
     audience_rating = movie_response_data.get('response', {}).get('data', {}).get('audience_rating')
 
+    # Check if the audience_rating is above
+    if audience_rating is None or audience_rating == '':
+        print(f"SKIPPING: {movie['title']} | No Audience Rating: {audience_rating}")
+        return 0
+
     # Check if the audience_rating is above 7
-    if audience_rating is not None and float(audience_rating) > 7:
-        print(f"SKIPPING: {movie['title']} | Audience Rating: {audience_rating} is above 7")
+    if float(audience_rating) > float(c.maxMovieRating):
+        print(f"SKIPPING: {movie['title']} | Audience Rating: {audience_rating} is above {c.maxMovieRating}")
         return 0
 
 

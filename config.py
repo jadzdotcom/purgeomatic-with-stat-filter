@@ -23,6 +23,8 @@ class Config:
         self.sonarrHost = os.getenv("SONARR", "http://localhost:8989")
         self.sonarrAPIkey = os.getenv("SONARR_API")
         self.maxTvRating = os.getenv("MAX_TV_RATING_TO_DELETE",7)
+        self.maxMovieRating = os.getenv("MAX_MOVIE_RATING_TO_DELETE",7)
+
         if self.dryrun:
             print("DRY_RUN enabled!")
 
