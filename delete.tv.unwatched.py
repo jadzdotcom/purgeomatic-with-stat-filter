@@ -32,6 +32,19 @@ def purge(series):
         f"{c.tautulliHost}/api/v2/?apikey={c.tautulliAPIkey}&cmd=get_metadata&rating_key={series['rating_key']}"
     )
 
+    # extract the audince rating as we will keep good movies
+    series_response_data = r.json()
+    audience_rating = series_response_data.get('response', {}).get('data', {}).get('audience_rating')
+
+    # Check if the audience_rating is above 
+    if audience_rating is None or audience_rating == '':
+        print(f"SKIPPING: {series['title']} | No Audience Rating: {audience_rating}")
+        return 0
+    if float(audience_rating) > float(c.maxTvRating):
+        print(f"SKIPPING: {series['title']} | Audience Rating: {audience_rating} is above {c.maxTvRating}")        
+        return 0
+
+
     guids = jq.compile(".[].data.guids").input(r.json()).first()
 
     try:
@@ -97,6 +110,8 @@ def purge(series):
             action
             + ": "
             + series["title"]
+            + " | Audience Rating: "
+            + str(audience_rating)
             + " | Sonarr ID: "
             + str(sonarr["id"])
             + " | TVDB ID: "
