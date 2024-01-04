@@ -31,6 +31,15 @@ def purge(movie):
     r = requests.get(
         f"{c.tautulliHost}/api/v2/?apikey={c.tautulliAPIkey}&cmd=get_metadata&rating_key={movie['rating_key']}"
     )
+    # extract the audince rating as we will keep good movies
+    movie_response_data = r.json()
+    audience_rating = movie_response_data.get('response', {}).get('data', {}).get('audience_rating')
+
+    # Check if the audience_rating is above 7
+    if audience_rating is not None and float(audience_rating) > 7:
+        print(f"SKIPPING: {movie['title']} | Audience Rating: {audience_rating} is above 7")
+        return 0
+
 
     guids = jq.compile(".[].data.guids").input(r.json()).first()
     try:
@@ -44,6 +53,8 @@ def purge(movie):
             + str(e)
         )
         guids = []
+
+    
 
     f = requests.get(f"{c.radarrHost}/api/v3/movie?apiKey={c.radarrAPIkey}")
     try:
@@ -94,6 +105,9 @@ def purge(movie):
             + movie["title"]
             + " | Radarr ID: "
             + str(radarr["id"])
+            #+ str(movie_response_data)
+            + " | Rating: "
+            + str(audience_rating)
             + " | TMDB ID: "
             + str(radarr["tmdbId"])
         )
